@@ -1,0 +1,17 @@
+# ביקור אוטומטי פעם בשבוע, כדי שהפרויקט החינמי ב-Supabase לא ייכנס להשהיה.
+name: keep-supabase-awake
+on:
+  schedule:
+    - cron: "0 7 * * 0,3"   # ימי ראשון ורביעי ב-07:00 UTC
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://tybldahjoojzbdrhrdvu.supabase.co/rest/v1/site_content?select=key&limit=1" \
+            -H "apikey: sb_publishable_E9jo4r1WcTBSTsm20fqcfw_fhXS1Ssp")
+          echo "status $code"
+          test "$code" = "200"
