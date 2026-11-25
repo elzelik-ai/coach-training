@@ -84,6 +84,8 @@
     const wa = current('contact.whatsapp') || phone;
     const msg = current('contact.wa_message');
     document.querySelectorAll('[data-edit-tel]').forEach(a => { a.href = 'tel:+' + intl(phone); a.hidden = !digits(phone); });
+    const mail = current('contact.email');
+    document.querySelectorAll('[data-edit-mail]').forEach(a => { a.href = 'mailto:' + mail; a.hidden = !mail; });
     document.querySelectorAll('[data-edit-wa]').forEach(a => {
       a.href = 'https://wa.me/' + intl(wa) + (msg ? '?text=' + encodeURIComponent(msg) : ''); a.hidden = !digits(wa);
     });
@@ -163,7 +165,14 @@
           a.href = url; a.target = '_blank'; a.rel = 'noopener';
           a.textContent = 'שליחה בוואטסאפ';
           done.after(a);
-          window.open(url, '_blank', 'noopener');
+          const mail = current('contact.email');
+          if (mail) {
+            const m = document.createElement('a');
+            m.className = 'btn btn--outline-ink btn--lg lead__wa';
+            m.href = 'mailto:' + mail + '?subject=' + encodeURIComponent('בדיקת התאמה להכשרה') + '&body=' + encodeURIComponent(text);
+            m.textContent = 'אין לי וואטסאפ? שליחה במייל';
+            a.after(m);
+          }
         }
       } catch {
         button.disabled = false;
