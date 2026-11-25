@@ -152,14 +152,16 @@
         form.querySelectorAll('.lead__field, .lead__submit, .lead__msg').forEach(el => { el.hidden = true; });
         const done = form.querySelector('.lead__done');
         done.hidden = false;
-        // בלי חיבור לענן: הפרטים נשלחים לבעל העסק בוואטסאפ
+        // הפרטים נשמרים בענן, ובנוסף אפשר לשלוח אותם לבעל העסק בוואטסאפ או במייל
         const wa = digits(current('contact.whatsapp') || current('contact.phone'));
-        if (!LIVE && wa) {
+        if (wa) {
           const NL = String.fromCharCode(10);
           const text = ['היי אלחנן, אשמח לבדיקת התאמה להכשרה.', 'שם: ' + lead.name, 'טלפון: ' + lead.phone,
             lead.service ? 'מסלול: ' + lead.service : '', lead.message || ''].filter(Boolean).join(NL);
           const url = 'https://wa.me/' + intl(wa) + '?text=' + encodeURIComponent(text);
-          done.textContent = 'עוד לחיצה אחת: שלחו לי את הפרטים בוואטסאפ, ואחזור אליכם.';
+          done.textContent = LIVE
+            ? 'קיבלתי! אחזור אליכם בימים הקרובים. רוצים תשובה מהירה יותר? שלחו לי גם הודעה:'
+            : 'עוד לחיצה אחת: שלחו לי את הפרטים בוואטסאפ, ואחזור אליכם.';
           const a = document.createElement('a');
           a.className = 'btn btn--green btn--lg lead__wa';
           a.href = url; a.target = '_blank'; a.rel = 'noopener';
