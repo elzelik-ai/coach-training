@@ -193,10 +193,10 @@
     if (new URLSearchParams(location.search).has('admin')) {
       const css = document.createElement('link');
       css.rel = 'stylesheet';
-      css.href = 'admin/admin.css';
+      css.href = 'admin/admin.css?v=2';
       document.head.append(css);
       const js = document.createElement('script');
-      js.src = 'admin/admin.js';
+      js.src = 'admin/admin.js?v=2';
       document.body.append(js);
     }
   }

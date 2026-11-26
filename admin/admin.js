@@ -168,18 +168,28 @@
         <form class="adm-card adm-login__card">
           <span class="adm-badge">אזור ניהול</span>
           <h1>${esc(brand())}</h1>
-          <p>נשלח לך למייל קישור כניסה. אין צורך בסיסמה.</p>
-          <label class="adm-field"><span>המייל שלך</span><input type="email" name="email" required autocomplete="email" dir="ltr" placeholder="name@example.com"></label>
-          <button class="adm-btn adm-btn--yellow adm-btn--wide" type="submit">שלחו לי קישור כניסה</button>
+          <label class="adm-field"><span>המייל שלך</span><input type="email" name="email" required autocomplete="username" dir="ltr" placeholder="name@example.com"></label>
+          <label class="adm-field"><span>סיסמה</span><input type="password" name="password" autocomplete="current-password" dir="ltr"></label>
+          <button class="adm-btn adm-btn--yellow adm-btn--wide" type="submit">כניסה</button>
           <p class="adm-login__note" role="status">${esc(note || '')}</p>
+          <button class="adm-link adm-link--btn" type="button" data-magic>כניסה ראשונה או שכחתי סיסמה? שלחו לי קישור למייל</button>
           <a class="adm-link" href="index.html">חזרה לאתר</a>
         </form>
       </div>`;
     const form = root.querySelector('form');
+    const out = root.querySelector('.adm-login__note');
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const email = form.email.value.trim();
-      const out = root.querySelector('.adm-login__note');
+      const password = form.password.value;
+      if (!password) { out.textContent = 'כתבו סיסמה, או בקשו קישור כניסה למייל.'; form.password.focus(); return; }
+      out.textContent = 'נכנס...';
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) out.textContent = 'המייל או הסיסמה לא נכונים. אפשר לבקש קישור כניסה למייל.';
+    });
+    root.querySelector('[data-magic]').addEventListener('click', async () => {
+      const email = form.email.value.trim();
+      if (!email) { out.textContent = 'כתבו קודם את המייל שלכם.'; form.email.focus(); return; }
       out.textContent = 'שולח...';
       const { error } = await sb.auth.signInWithOtp({
         email,
@@ -187,7 +197,7 @@
       });
       out.textContent = error
         ? 'המייל הזה לא רשום כמנהל של האתר.'
-        : 'שלחנו לך קישור. פתחו את המייל ולחצו עליו, והכניסה תתבצע כאן.';
+        : 'שלחנו לך קישור. פתחו את המייל ולחצו עליו. אחרי הכניסה אפשר לקבוע סיסמה בלשונית "פרטי קשר וצבעים".';
     });
   }
 
@@ -460,8 +470,31 @@
         <div class="adm-colors">
           ${colors.map(([k, label]) => `<label class="adm-color"><input type="color" data-key="${k}" value="${esc(S.current(k) || '#000000')}"><span>${label}</span><button type="button" class="adm-reset" data-reset="${k}" title="חזרה לצבע המקורי" aria-label="חזרה לצבע המקורי">↺</button></label>`).join('')}
         </div>
-      </section>`;
+      </section>
+      ${S.LIVE ? `<section class="adm-card adm-group adm-group--flat"><h3>סיסמה לכניסה</h3>
+        <p class="adm-hint">קובעים סיסמה פעם אחת, ומעכשיו נכנסים עם מייל וסיסמה, בלי לחכות לקישור.</p>
+        <form class="adm-pass" autocomplete="on">
+          <input type="email" name="username" autocomplete="username" hidden>
+          <label class="adm-field"><span>סיסמה חדשה (לפחות 8 תווים)</span><input type="password" name="p1" autocomplete="new-password" dir="ltr" minlength="8"></label>
+          <label class="adm-field"><span>שוב, לאימות</span><input type="password" name="p2" autocomplete="new-password" dir="ltr" minlength="8"></label>
+          <button class="adm-btn adm-btn--yellow" type="submit">שמירת הסיסמה</button>
+        </form>
+      </section>` : ''}`;
     bindFields(main);
+    const pass = main.querySelector('.adm-pass');
+    if (pass) {
+      sb.auth.getUser().then(({ data }) => { pass.username.value = data?.user?.email || ''; });
+      pass.addEventListener('submit', async e => {
+        e.preventDefault();
+        const p1 = pass.p1.value, p2 = pass.p2.value;
+        if (p1.length < 8) { toast('הסיסמה צריכה להיות לפחות 8 תווים', true); return; }
+        if (p1 !== p2) { toast('שתי הסיסמאות לא זהות', true); return; }
+        const { error } = await sb.auth.updateUser({ password: p1 });
+        if (error) { toast('לא הצלחנו לשמור. נסו סיסמה אחרת.', true); return; }
+        pass.reset();
+        toast('הסיסמה נשמרה. מעכשיו נכנסים עם מייל וסיסמה.');
+      });
+    }
   }
 
   // ---------- הפעלה ----------
