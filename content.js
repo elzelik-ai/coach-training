@@ -108,7 +108,17 @@
     return Object.fromEntries(rows.map(r => [r.key, r.value]));
   }
 
+  // שליחה לסקריפט של גוגל: שורה בגיליון הלידים + מייל התראה
+  function notifyHook(lead) {
+    if (!CFG.leadsHook) return;
+    try {
+      fetch(CFG.leadsHook, { method: 'POST', mode: 'no-cors', keepalive: true,
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(lead) });
+    } catch {}
+  }
+
   async function addLead(lead) {
+    notifyHook(lead);
     if (!LIVE) {
       const leads = readJSON(STORE.leads, []);
       leads.unshift({ id: String(Date.now()), created_at: new Date().toISOString(), status: 'חדש', ...lead });
