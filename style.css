@@ -416,3 +416,18 @@ ul, ol { list-style: none; margin: 0; padding: 0; }
 .price__why { margin: 0 0 22px; padding-bottom: 20px; border-bottom: 1.5px dashed var(--line); font-size: 18px; font-weight: 500; line-height: 1.6; color: var(--ink); text-align: center; }
 section[id] { scroll-margin-top: 90px; }
 .lead__wa { width: 100%; }
+
+/* ---------- צילומי מסך של המלצות ---------- */
+.shots-head { margin: 64px auto 22px; max-width: 640px; text-align: center; }
+.shots-head h3 { font-size: clamp(24px, 3vw, 32px); }
+.shots-head p { margin-top: 8px; color: var(--muted); }
+.shots { columns: 2 150px; column-gap: 14px; }
+.shot { display: block; width: 100%; margin: 0 0 14px; padding: 0; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: #fff; cursor: zoom-in; break-inside: avoid; box-shadow: 0 14px 34px -20px color-mix(in srgb, var(--ink) 45%, transparent); transition: transform .2s; }
+.shot:hover { transform: translateY(-3px); }
+.shot img { width: 100%; height: auto; }
+@media (min-width: 720px) { .shots { columns: 3; } }
+@media (min-width: 1000px) { .shots { columns: 4; } .quotes { grid-template-columns: repeat(3, 1fr); } }
+.lightbox { max-width: min(92vw, 720px); max-height: 92vh; padding: 0; border: 0; border-radius: 18px; background: #fff; overflow: auto; }
+.lightbox::backdrop { background: rgb(20 24 28 / .75); }
+.lightbox img { width: 100%; height: auto; }
+.lightbox__close { position: sticky; top: 8px; float: left; margin: 8px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--ink); color: #fff; font-size: 26px; cursor: pointer; }
